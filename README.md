@@ -15,15 +15,14 @@ https://userdevtec.github.io/ifc-lab
 ## Installatie
 
 ```powershell
-cd C:\Users\ud38\Desktop\ifc-lab
 npm install
 ```
 
 Kopieer de worker en wasm uit `node_modules` naar `public`:
 
 ```powershell
-copy C:\Users\ud38\Desktop\ifc-lab\node_modules\@thatopen\fragments\dist\Worker\worker.mjs C:\Users\ud38\Desktop\ifc-lab\public\worker.mjs
-copy C:\Users\ud38\Desktop\ifc-lab\node_modules\web-ifc\web-ifc.wasm C:\Users\ud38\Desktop\ifc-lab\public\wasm\web-ifc.wasm
+copy node_modules\@thatopen\fragments\dist\Worker\worker.mjs public\worker.mjs
+copy node_modules\web-ifc\web-ifc.wasm public\wasm\web-ifc.wasm
 ```
 
 ## Starten
