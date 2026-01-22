@@ -2,6 +2,11 @@
 
 Vite-app voor het laden van `.ifc` en `.frag` bestanden met That Open Engine.
 IFC-bestanden worden na het laden automatisch omgezet naar fragments en direct getoond.
+[![Deploy to GitHub Pages](https://github.com/UserDevtec/ifc-lab/actions/workflows/deploy.yml/badge.svg)](https://github.com/UserDevtec/ifc-lab/actions/workflows/deploy.yml)
+
+https://userdevtec.github.io/ifc-lab
+
+<img width="1844" height="1028" alt="image" src="https://github.com/user-attachments/assets/816fbbef-8ebe-444a-ac70-542dfc30a989" />
 
 ## Vereisten
 
