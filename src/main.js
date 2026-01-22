@@ -36,10 +36,6 @@ app.innerHTML = `
       <div class="upload" id="dropZone">
         <strong>Sleep hier een .ifc of .frag</strong>
         <span class="hint">of gebruik de knop hierboven</span>
-        <label class="inline-field">
-          <input id="autoConvert" type="checkbox" checked />
-          Automatisch IFC naar fragment converteren
-        </label>
       </div>
 
       <p class="upload-status" id="statusText">Nog geen bestand geladen.</p>
@@ -63,10 +59,13 @@ app.innerHTML = `
 
     <section class="panel">
       <div class="panel-header">
-        <h2>Viewer</h2>
+        <div class="viewer-title">
+          <button class="ghost small" id="expandBtn" type="button">Expand</button>
+          <h2>Viewer</h2>
+        </div>
         <span class="hint">Sleep om te draaien, scroll om te zoomen</span>
       </div>
-      <div class="viewer-wrap">
+      <div class="viewer-wrap" id="viewerWrap">
         <div id="viewer" class="viewer"></div>
         <div id="viewerOverlay" class="viewer-overlay">
           <span>
@@ -76,6 +75,9 @@ app.innerHTML = `
         </div>
       </div>
     </section>
+    <div class="fullscreen-overlay" id="fullscreenOverlay">
+      <button class="ghost fullscreen-close" id="closeFullscreen" type="button">Sluiten</button>
+    </div>
   </div>
 `;
 
@@ -89,7 +91,10 @@ const elements = {
   fragHint: document.getElementById("fragHint"),
   downloadBtn: document.getElementById("downloadBtn"),
   resetBtn: document.getElementById("resetBtn"),
-  autoConvert: document.getElementById("autoConvert"),
+  expandBtn: document.getElementById("expandBtn"),
+  closeFullscreen: document.getElementById("closeFullscreen"),
+  fullscreenOverlay: document.getElementById("fullscreenOverlay"),
+  viewerWrap: document.getElementById("viewerWrap"),
   overlay: document.getElementById("viewerOverlay"),
   overlayText: document.getElementById("overlayText"),
   viewer: document.getElementById("viewer")
@@ -218,12 +223,6 @@ const loadIfcFile = async (file) => {
   state.sourceType = "IFC (.ifc)";
   updateStats();
 
-  if (!elements.autoConvert.checked) {
-    setStatus("IFC geladen. Auto-conversie uitgeschakeld.");
-    setOverlay("IFC geladen", false);
-    return;
-  }
-
   setStatus("IFC geladen. Converteren naar fragments op de achtergrond...");
   setOverlay("Converteer IFC naar fragments...", true);
 
@@ -281,27 +280,43 @@ const resetView = () => {
 };
 
 const setupDropzone = () => {
-  const { dropZone } = elements;
+  const { dropZone, viewerWrap } = elements;
 
   const setDragging = (dragging) => {
     dropZone.classList.toggle("dragging", dragging);
+    viewerWrap.classList.toggle("dragging", dragging);
   };
 
-  dropZone.addEventListener("dragover", (event) => {
+  const onDragOver = (event) => {
     event.preventDefault();
     setDragging(true);
-  });
+  };
 
-  dropZone.addEventListener("dragleave", () => {
+  const onDragLeave = () => {
     setDragging(false);
-  });
+  };
 
-  dropZone.addEventListener("drop", (event) => {
+  const onDrop = (event) => {
     event.preventDefault();
     setDragging(false);
     const [file] = event.dataTransfer.files;
     handleFile(file);
-  });
+  };
+
+  dropZone.addEventListener("dragover", onDragOver);
+  dropZone.addEventListener("dragleave", onDragLeave);
+  dropZone.addEventListener("drop", onDrop);
+
+  viewerWrap.addEventListener("dragover", onDragOver);
+  viewerWrap.addEventListener("dragleave", onDragLeave);
+  viewerWrap.addEventListener("drop", onDrop);
+};
+
+const setFullscreen = (enabled) => {
+  elements.viewerWrap.classList.toggle("fullscreen", enabled);
+  elements.fullscreenOverlay.classList.toggle("active", enabled);
+  document.body.style.overflow = enabled ? "hidden" : "";
+  world.renderer.resize();
 };
 
 setupDropzone();
@@ -313,6 +328,18 @@ elements.fileInput.addEventListener("change", (event) => {
 
 elements.downloadBtn.addEventListener("click", downloadFrag);
 elements.resetBtn.addEventListener("click", resetView);
+elements.expandBtn.addEventListener("click", () => setFullscreen(true));
+elements.closeFullscreen.addEventListener("click", () => setFullscreen(false));
+elements.fullscreenOverlay.addEventListener("click", (event) => {
+  if (event.target === elements.fullscreenOverlay) {
+    setFullscreen(false);
+  }
+});
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    setFullscreen(false);
+  }
+});
 
 setOverlay("Wachten op bestand...", true);
 updateStats();
