@@ -59,6 +59,29 @@ app.innerHTML = `
     <div class="fullscreen-overlay" id="fullscreenOverlay">
       <button class="ghost fullscreen-close" id="closeFullscreen" type="button">Sluiten</button>
     </div>
+    <div class="tutorial-fab-wrap" id="helpFab">
+      <button class="tutorial-fab" type="button" id="helpToggle">?</button>
+      <span class="tutorial-fab-label">Support? Jonathan van der Gouwe</span>
+    </div>
+    <div class="tutorial-overlay hidden" id="helpOverlay">
+      <button class="tutorial-close ghost" type="button" id="helpClose">Sluiten</button>
+      <div class="tutorial-stage" id="helpStage">
+        <div class="tutorial-item" data-target="viewerWrap">
+          <div class="tutorial-spot"></div>
+          <div class="tutorial-card">
+            <h4>Viewer</h4>
+            <p>Sleep om te draaien, scroll om te zoomen. Gebruik de overlay om een bestand te laden.</p>
+          </div>
+        </div>
+        <div class="tutorial-item" data-target="expandBtn">
+          <div class="tutorial-spot"></div>
+          <div class="tutorial-card">
+            <h4>Expand</h4>
+            <p>Open de viewer fullscreen voor een groter canvas.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 `;
 
@@ -71,6 +94,11 @@ const elements = {
   closeFullscreen: document.getElementById("closeFullscreen"),
   fullscreenOverlay: document.getElementById("fullscreenOverlay"),
   viewerWrap: document.getElementById("viewerWrap"),
+  helpFab: document.getElementById("helpFab"),
+  helpToggle: document.getElementById("helpToggle"),
+  helpOverlay: document.getElementById("helpOverlay"),
+  helpClose: document.getElementById("helpClose"),
+  helpStage: document.getElementById("helpStage"),
   overlay: document.getElementById("viewerOverlay"),
   overlayText: document.getElementById("overlayText"),
   viewer: document.getElementById("viewer")
@@ -102,6 +130,19 @@ world.camera.controls.zoomSpeed = 2.0;
 
 await world.camera.controls.setLookAt(18, 12, 18, 0, 0, 0);
 components.init();
+
+const resizeViewer = () => {
+  world.renderer.resize();
+};
+
+const resizeObserver = new ResizeObserver(() => {
+  resizeViewer();
+});
+resizeObserver.observe(elements.viewerWrap);
+
+const grids = components.get(OBC.Grids);
+const grid = grids.create(world);
+grid.visible = true;
 
 const fragments = components.get(OBC.FragmentsManager);
 fragments.init("/worker.mjs");
@@ -278,13 +319,47 @@ const setupDropzone = () => {
   viewerWrap.addEventListener("drop", onDrop);
 };
 
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+const updateHelpLayout = () => {
+  const items = elements.helpStage.querySelectorAll(".tutorial-item");
+  items.forEach((item) => {
+    const targetId = item.dataset.target;
+    const target = elements[targetId];
+    const spot = item.querySelector(".tutorial-spot");
+    const card = item.querySelector(".tutorial-card");
+    if (!target || !spot || !card) return;
+
+    const rect = target.getBoundingClientRect();
+    spot.style.left = `${rect.left}px`;
+    spot.style.top = `${rect.top}px`;
+    spot.style.width = `${rect.width}px`;
+    spot.style.height = `${rect.height}px`;
+
+    const cardRect = card.getBoundingClientRect();
+    const gap = 16;
+    let left = rect.right + gap;
+    let top = rect.top + Math.min(24, rect.height / 2);
+
+    if (left + cardRect.width > window.innerWidth - gap) {
+      left = rect.left - cardRect.width - gap;
+    }
+
+    left = clamp(left, gap, window.innerWidth - cardRect.width - gap);
+    top = clamp(top, gap, window.innerHeight - cardRect.height - gap);
+
+    card.style.left = `${left}px`;
+    card.style.top = `${top}px`;
+  });
+};
+
 const syncFullscreenState = () => {
   const isFullscreen = document.fullscreenElement === elements.viewerWrap;
   elements.viewerWrap.classList.toggle("fullscreen", isFullscreen);
   elements.fullscreenOverlay.classList.toggle("active", isFullscreen);
   elements.expandBtn.classList.toggle("hidden", isFullscreen);
   document.body.style.overflow = isFullscreen ? "hidden" : "";
-  world.renderer.resize();
+  resizeViewer();
 };
 
 const setFullscreen = async (enabled) => {
@@ -312,7 +387,7 @@ const setFullscreen = async (enabled) => {
   elements.fullscreenOverlay.classList.toggle("active", enabled);
   elements.expandBtn.classList.toggle("hidden", enabled);
   document.body.style.overflow = enabled ? "hidden" : "";
-  world.renderer.resize();
+  resizeViewer();
 };
 
 setupDropzone();
@@ -337,6 +412,37 @@ window.addEventListener("keydown", (event) => {
   }
 });
 document.addEventListener("fullscreenchange", syncFullscreenState);
+window.addEventListener("resize", resizeViewer);
+
+const toggleHelp = (open) => {
+  const next = typeof open === "boolean" ? open : elements.helpOverlay.classList.contains("hidden");
+  elements.helpOverlay.classList.toggle("hidden", !next);
+  elements.helpFab.classList.toggle("open", next);
+  if (next) {
+    updateHelpLayout();
+  }
+};
+
+elements.helpToggle.addEventListener("click", () => toggleHelp());
+elements.helpClose.addEventListener("click", (event) => {
+  event.stopPropagation();
+  toggleHelp(false);
+});
+elements.helpOverlay.addEventListener("click", () => toggleHelp(false));
+window.addEventListener("resize", () => {
+  if (!elements.helpOverlay.classList.contains("hidden")) {
+    updateHelpLayout();
+  }
+});
+window.addEventListener(
+  "scroll",
+  () => {
+    if (!elements.helpOverlay.classList.contains("hidden")) {
+      updateHelpLayout();
+    }
+  },
+  true
+);
 
 setOverlay("Upload bestand of selecteer bestand", false, true);
 updateStats();
