@@ -109,6 +109,11 @@ const state = {
   downloadName: "model.frag"
 };
 
+const baseUrl = import.meta.env.BASE_URL || "/";
+const publicBase = new URL(baseUrl, window.location.href);
+const workerUrl = new URL("worker.mjs", publicBase).href;
+const wasmPath = new URL("wasm/", publicBase).href;
+
 const components = new OBC.Components();
 const worlds = components.get(OBC.Worlds);
 const world = worlds.create();
@@ -145,7 +150,7 @@ const grid = grids.create(world);
 grid.visible = true;
 
 const fragments = components.get(OBC.FragmentsManager);
-fragments.init("/worker.mjs");
+fragments.init(workerUrl);
 
 world.camera.controls.addEventListener("rest", () => fragments.core.update(true));
 
@@ -191,7 +196,7 @@ const ensureIfcLoader = async () => {
   await ifcLoader.setup({
     autoSetWasm: false,
     wasm: {
-      path: "/wasm/",
+      path: wasmPath,
       absolute: true
     }
   });
