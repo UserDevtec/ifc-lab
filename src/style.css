@@ -129,9 +129,31 @@ a {
   gap: 12px;
 }
 
-.ghost.small {
-  padding: 8px 14px;
-  font-size: 0.85rem;
+.expand-inline {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: #ffffff;
+  border: 1px solid #d7dbe6;
+  box-shadow: 0 10px 20px rgba(31, 39, 54, 0.08);
+}
+
+.expand-icon {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: #111318;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hidden {
+  display: none;
 }
 
 .panel h2 {
@@ -285,7 +307,34 @@ a {
   pointer-events: none;
 }
 
-.viewer-overlay span {
+.viewer-overlay.idle .overlay-busy {
+  display: none;
+}
+
+.viewer-overlay.busy .overlay-idle {
+  display: none;
+}
+
+.overlay-idle {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+
+.overlay-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111318;
+}
+
+.overlay-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #5a6378;
+}
+
+.overlay-busy {
   display: inline-flex;
   align-items: center;
   gap: 10px;
