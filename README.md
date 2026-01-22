@@ -8,31 +8,6 @@ https://userdevtec.github.io/ifc-lab
 
 <img width="1844" height="1024" alt="image" src="https://github.com/user-attachments/assets/b03160c2-fbbb-48d1-850f-f6c659df28d0" />
 
-## Vereisten
-
-- Node.js + npm
-
-## Installatie
-
-```powershell
-npm install
-```
-
-Kopieer de worker en wasm uit `node_modules` naar `public`:
-
-```powershell
-copy node_modules\@thatopen\fragments\dist\Worker\worker.mjs public\worker.mjs
-copy node_modules\web-ifc\web-ifc.wasm public\wasm\web-ifc.wasm
-```
-
-## Starten
-
-```powershell
-npm run dev
-```
-
-Open daarna de URL die Vite laat zien (standaard `http://localhost:5173`).
-
 ## Gebruik
 
 - Sleep een `.ifc` of `.frag` bestand in het venster of gebruik de knop.
