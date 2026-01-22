@@ -6,7 +6,7 @@ IFC-bestanden worden na het laden automatisch omgezet naar fragments en direct g
 
 https://userdevtec.github.io/ifc-lab
 
-<img width="1844" height="1028" alt="image" src="https://github.com/user-attachments/assets/816fbbef-8ebe-444a-ac70-542dfc30a989" />
+<img width="1844" height="1024" alt="image" src="https://github.com/user-attachments/assets/b03160c2-fbbb-48d1-850f-f6c659df28d0" />
 
 ## Vereisten
 
