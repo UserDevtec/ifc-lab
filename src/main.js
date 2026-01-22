@@ -7,7 +7,7 @@ app.innerHTML = `
   <div class="app">
     <header class="hero">
       <div>
-        <p class="eyebrow">IFC Lab</p>
+        <p class="eyebrow">IFCVIEWER LAB</p>
         <h1>IFC & Fragment Viewer</h1>
         <p class="subtitle">
           Laad een .ifc of .frag bestand. Grote IFC's worden automatisch
